@@ -1,0 +1,360 @@
+{
+  "name": "claude-code-figma-mcp",
+  "description": "Motion-graphics promo for the FlowHunt blog \"How to Use Claude Code with Figma MCP\".",
+  "version": "1.0.0",
+  "output": {
+    "type": "video",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "duration": 95,
+    "backgroundColor": "#FFFFFF"
+  },
+  "customComponents": {
+    "SceneHook": {
+      "type": "inline",
+      "code": "function SceneHook(props){var R=React.createElement;\nvar cl=function(x){return Math.max(0,Math.min(1,x));};\nvar ease=function(t){return 1-Math.pow(1-t,3);};\nvar easeIn=function(t){return t*t*t;};\nvar easeInOut=function(t){return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;};\nvar easeBack=function(t){var c1=1.70158;var c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);};\nvar lerp=function(a,b,t){return a+(b-a)*t;};\nvar grad='linear-gradient(90deg,#0084FF,#1A56DB)';\n  var END=240;\n  var f=props.frame||0;\n  var sceneIn  = ease(cl(f/24));\n  var sceneOut = easeIn(cl((f-(END-24))/24));\n  var sceneOp  = sceneIn - sceneOut;\n\n  var l1In = ease(cl((f-10)/22));\n  var l2In = ease(cl((f-90)/22));\n  var l3In = ease(cl((f-160)/18));\n  var l3Pulse = 1 + 0.04 * Math.sin(cl((f-180)/40)*Math.PI);\n\n  return R('div', { style:{ width:'100%', height:'100%', background:'#FFFFFF', opacity:sceneOp, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:'24px', fontFamily:'Inter' } },\n    R('div', { style:{ fontSize:'72px', fontWeight:600, color:'#111928', opacity:l1In, transform:'translateY('+(20*(1-l1In))+'px)' } }, 'A designer hands you a Figma file.'),\n    R('div', { style:{ fontSize:'40px', fontWeight:400, color:'#6B7280', opacity:l2In, transform:'translateY('+(16*(1-l2In))+'px)' } }, 'Used to mean an afternoon of pixel-pushing in code.'),\n    R('div', { style:{ fontSize:'88px', fontWeight:800, opacity:l3In, transform:'scale('+(0.94+0.06*l3In)+') scale('+l3Pulse+')', background:grad, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', marginTop:'24px' } }, 'Not anymore.')\n  );\n}"
+    },
+    "SceneDesign": {
+      "type": "inline",
+      "code": "function SceneDesign(props){var R=React.createElement;\nvar cl=function(x){return Math.max(0,Math.min(1,x));};\nvar ease=function(t){return 1-Math.pow(1-t,3);};\nvar easeIn=function(t){return t*t*t;};\nvar easeInOut=function(t){return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;};\nvar easeBack=function(t){var c1=1.70158;var c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);};\nvar lerp=function(a,b,t){return a+(b-a)*t;};\nvar grad='linear-gradient(90deg,#0084FF,#1A56DB)';\n  var END=360;\n  var f=props.frame||0;\n  var sceneIn  = ease(cl(f/26));\n  var sceneOut = easeIn(cl((f-(END-26))/26));\n  var sceneOp  = sceneIn - sceneOut;\n\n  var browserScale = 0.96 + 0.04 * ease(cl(f/34));\n\n  // Stagger chart cards entry\n  function cardOp(i){ return ease(cl((f - (40 + i*10)) / 22)); }\n  function cardY(i){ return 14 * (1 - cardOp(i)); }\n\n  var titleIn = ease(cl((f-30)/26));\n\n  // Mini chart palette\n  var palette = ['#0084FF','#1A56DB','#22C55E','#F59E0B','#EF4444','#8B5CF6'];\n\n  function bars(seed){\n    var arr=[];\n    for(var i=0;i<7;i++){\n      var h = 14 + ((seed*13 + i*29) % 60);\n      arr.push(R('div', { key:i, style:{ width:'10px', height:h+'px', background:palette[(seed+i)%palette.length], borderRadius:'2px' } }));\n    }\n    return R('div', { style:{ display:'flex', alignItems:'flex-end', gap:'4px', height:'78px' } }, arr);\n  }\n  function line(seed){\n    var pts='';\n    for(var i=0;i<8;i++){\n      var x = i*22;\n      var y = 70 - ((seed*11 + i*17 + (i*i*5)) % 50);\n      pts += (i?' L':'M') + x + ' ' + y;\n    }\n    return R('svg', { width:160, height:78, viewBox:'0 0 160 78' },\n      R('path', { d:pts, fill:'none', stroke:palette[seed%palette.length], strokeWidth:2.5, strokeLinecap:'round' })\n    );\n  }\n  function donut(seed){\n    var p = 0.35 + ((seed*7)%50)/100;\n    var c = 2*Math.PI*28;\n    return R('svg', { width:80, height:78, viewBox:'0 0 80 78' },\n      R('circle', { cx:40, cy:39, r:28, fill:'none', stroke:'#E5E7EB', strokeWidth:8 }),\n      R('circle', { cx:40, cy:39, r:28, fill:'none', stroke:palette[seed%palette.length], strokeWidth:8, strokeDasharray:c, strokeDashoffset:c*(1-p), transform:'rotate(-90 40 39)', strokeLinecap:'round' })\n    );\n  }\n\n  function card(i, kind, title){\n    var op = cardOp(i);\n    if (op < 0.005) return null;\n    var content = kind===0 ? bars(i+1) : kind===1 ? line(i+1) : donut(i+1);\n    return R('div', { key:i, style:{ background:'#FFFFFF', border:'1px solid #E5E7EB', borderRadius:'12px', padding:'16px', display:'flex', flexDirection:'column', justifyContent:'space-between', boxShadow:'0 4px 12px rgba(17,25,40,0.04)', opacity:op, transform:'translateY('+cardY(i)+'px)', minHeight:'140px' } },\n      R('div', { style:{ fontSize:'13px', fontWeight:600, color:'#6B7280', letterSpacing:'0.04em', textTransform:'uppercase' } }, title),\n      R('div', { style:{ display:'flex', justifyContent:'center', alignItems:'flex-end' } }, content)\n    );\n  }\n\n  var cards = [\n    card(0,0,'Revenue'),\n    card(1,1,'Users'),\n    card(2,2,'Conversion'),\n    card(3,1,'MRR'),\n    card(4,0,'Sessions'),\n    card(5,2,'Retention'),\n  ];\n\n  return R('div', { style:{ width:'100%', height:'100%', background:'#F9FAFB', opacity:sceneOp, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Inter' } },\n    R('div', { style:{ width:'1700px', background:'#FFFFFF', borderRadius:'14px', boxShadow:'0 30px 60px rgba(17,25,40,0.10)', overflow:'hidden', transform:'scale('+browserScale+')' } },\n      // browser chrome\n      R('div', { style:{ height:'42px', background:'#F3F4F6', display:'flex', alignItems:'center', padding:'0 16px', gap:'8px', borderBottom:'1px solid #E5E7EB' } },\n        R('div', { style:{ width:12, height:12, borderRadius:'50%', background:'#FF5F57' } }),\n        R('div', { style:{ width:12, height:12, borderRadius:'50%', background:'#FEBC2E' } }),\n        R('div', { style:{ width:12, height:12, borderRadius:'50%', background:'#28C840' } }),\n        R('div', { style:{ marginLeft:'24px', background:'#FFFFFF', border:'1px solid #E5E7EB', borderRadius:'8px', padding:'4px 14px', fontSize:'13px', color:'#6B7280', fontFamily:'Inter' } }, 'figma.com/design/abc123/Data-Visualization-Kit?node-id=1-234')\n      ),\n      // figma frame body\n      R('div', { style:{ display:'flex', minHeight:'820px' } },\n        // left: cover with title\n        R('div', { style:{ flex:'0 0 720px', padding:'72px 56px', display:'flex', flexDirection:'column', justifyContent:'center', gap:'18px', borderRight:'1px solid #F3F4F6' } },\n          R('div', { style:{ fontSize:'14px', fontWeight:700, color:'#0084FF', letterSpacing:'0.12em', opacity:titleIn, transform:'translateX('+((1-titleIn)*-12)+'px)' } }, 'DATA VISUALIZATION'),\n          R('div', { style:{ fontSize:'72px', fontWeight:800, lineHeight:1.05, color:'#111928', opacity:titleIn, transform:'translateX('+((1-titleIn)*-12)+'px)' } },\n            'Graphs & Charts ',\n            R('span', { style:{ background:grad, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' } }, 'Kit')\n          ),\n          R('div', { style:{ fontSize:'22px', color:'#6B7280', maxWidth:'520px', opacity:ease(cl((f-50)/30)) } }, 'Real layout. Real type. Real colors. Ready for code.'),\n          R('div', { style:{ display:'flex', gap:'10px', marginTop:'8px', opacity:ease(cl((f-70)/30)) } },\n            R('div', { style:{ fontSize:'13px', fontWeight:600, color:'#0084FF', background:'#E0F2FE', padding:'6px 14px', borderRadius:'999px' } }, '1920 × 1080'),\n            R('div', { style:{ fontSize:'13px', fontWeight:600, color:'#1A56DB', background:'#EFF6FF', padding:'6px 14px', borderRadius:'999px' } }, 'Auto-layout'),\n            R('div', { style:{ fontSize:'13px', fontWeight:600, color:'#6B7280', background:'#F3F4F6', padding:'6px 14px', borderRadius:'999px' } }, '24 components')\n          )\n        ),\n        // right: card mosaic\n        R('div', { style:{ flex:'1 1 auto', padding:'48px', background:'#FAFBFC', display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'18px', alignContent:'center' } }, cards)\n      )\n    )\n  );\n}"
+    },
+    "SceneHandoff": {
+      "type": "inline",
+      "code": "function SceneHandoff(props){var R=React.createElement;\nvar cl=function(x){return Math.max(0,Math.min(1,x));};\nvar ease=function(t){return 1-Math.pow(1-t,3);};\nvar easeIn=function(t){return t*t*t;};\nvar easeInOut=function(t){return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;};\nvar easeBack=function(t){var c1=1.70158;var c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);};\nvar lerp=function(a,b,t){return a+(b-a)*t;};\nvar grad='linear-gradient(90deg,#0084FF,#1A56DB)';\n  var END=300;\n  var f=props.frame||0;\n  var sceneIn  = ease(cl(f/24));\n  var sceneOut = easeIn(cl((f-(END-24))/24));\n  var sceneOp  = sceneIn - sceneOut;\n\n  // Left figma URL pill, right terminal — the URL \"flies\" across between t=70..150\n  var flyP = easeInOut(cl((f-60)/60));\n  var leftIn  = ease(cl(f/24));\n  var rightIn = ease(cl((f-30)/26));\n\n  // After flyP=1, type the prompt in terminal\n  var typeStart = 130;\n  var prompt = \"I have figma MCP connected. Call get_design_context with this URL.\";\n  var typedChars = Math.floor(cl((f-typeStart)/100) * prompt.length);\n  var typed = prompt.slice(0, typedChars);\n  var caretOn = (f >= typeStart) && (Math.floor((f-typeStart)/12) % 2 === 0);\n\n  // After typing, show MCP call line\n  var mcpIn = ease(cl((f-240)/26));\n\n  // URL traveling element\n  var startX = 260, endX = 1180;\n  var travelX = lerp(startX, endX, flyP);\n  var travelY = lerp(360, 470, flyP);\n  var travelOp = (flyP > 0.02 && flyP < 0.98) ? 1 : 0;\n\n  return R('div', { style:{ width:'100%', height:'100%', background:'#F9FAFB', opacity:sceneOp, fontFamily:'Inter', position:'relative' } },\n    // LEFT — Figma frame card with URL highlight\n    R('div', { style:{ position:'absolute', left:'80px', top:'150px', width:'780px', background:'#FFFFFF', borderRadius:'14px', boxShadow:'0 24px 50px rgba(17,25,40,0.08)', overflow:'hidden', opacity:leftIn, transform:'translateY('+((1-leftIn)*16)+'px)' } },\n      R('div', { style:{ height:'40px', background:'#F3F4F6', display:'flex', alignItems:'center', padding:'0 14px', gap:'6px', borderBottom:'1px solid #E5E7EB' } },\n        R('div', { style:{ width:11, height:11, borderRadius:'50%', background:'#FF5F57' } }),\n        R('div', { style:{ width:11, height:11, borderRadius:'50%', background:'#FEBC2E' } }),\n        R('div', { style:{ width:11, height:11, borderRadius:'50%', background:'#28C840' } }),\n        R('div', { style:{ marginLeft:'14px', fontSize:'13px', color:'#6B7280' } }, 'Figma — Data Visualization Kit')\n      ),\n      R('div', { style:{ padding:'40px 36px 32px 36px' } },\n        R('div', { style:{ fontSize:'13px', fontWeight:700, color:'#0084FF', letterSpacing:'0.12em', marginBottom:'10px' } }, 'SELECTED FRAME'),\n        R('div', { style:{ fontSize:'40px', fontWeight:800, color:'#111928', lineHeight:1.1, marginBottom:'24px' } },\n          'Charts ',\n          R('span', { style:{ background:grad, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' } }, 'Cover')\n        ),\n        R('div', { style:{ background:'#F3F4F6', border:'1px solid #E5E7EB', borderRadius:'10px', padding:'14px 18px', fontSize:'15px', fontFamily:'JetBrains Mono, monospace', color:'#111928', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', boxShadow: f>50 && f<140 ? '0 0 0 3px rgba(0,132,255,'+(0.6*Math.sin(cl((f-50)/30)*Math.PI))+')' : 'none' } },\n          R('span', { style:{ color:'#6B7280' } }, 'figma.com/design/abc123/'),\n          R('span', { style:{ color:'#0084FF', fontWeight:700 } }, 'MyFile?node-id=1-234')\n        )\n      )\n    ),\n\n    // CENTER — flying URL bubble\n    travelOp > 0.01 ? R('div', { style:{ position:'absolute', left:travelX+'px', top:travelY+'px', transform:'translate(-50%,-50%) scale('+(0.9+0.1*Math.sin(flyP*Math.PI))+')', background:grad, color:'#FFFFFF', padding:'10px 22px', borderRadius:'999px', fontSize:'15px', fontWeight:700, fontFamily:'JetBrains Mono, monospace', boxShadow:'0 12px 30px rgba(0,132,255,0.40)', opacity:travelOp } }, 'node-id=1-234') : null,\n\n    // RIGHT — Claude Code terminal\n    R('div', { style:{ position:'absolute', right:'80px', top:'150px', width:'860px', background:'#0F172A', borderRadius:'14px', boxShadow:'0 24px 50px rgba(17,25,40,0.18)', overflow:'hidden', opacity:rightIn, transform:'translateY('+((1-rightIn)*16)+'px)' } },\n      R('div', { style:{ height:'40px', background:'#1E293B', display:'flex', alignItems:'center', padding:'0 14px', gap:'6px' } },\n        R('div', { style:{ width:11, height:11, borderRadius:'50%', background:'#FF5F57' } }),\n        R('div', { style:{ width:11, height:11, borderRadius:'50%', background:'#FEBC2E' } }),\n        R('div', { style:{ width:11, height:11, borderRadius:'50%', background:'#28C840' } }),\n        R('div', { style:{ marginLeft:'14px', fontSize:'13px', color:'#94A3B8', fontFamily:'Inter' } }, 'claude — terminal')\n      ),\n      R('div', { style:{ padding:'28px 30px', fontFamily:'JetBrains Mono, monospace', fontSize:'17px', lineHeight:1.6, color:'#E2E8F0', minHeight:'460px' } },\n        R('div', { style:{ color:'#22C55E' } }, '$ claude'),\n        R('div', { style:{ marginTop:'8px', color:'#94A3B8' } }, '╭─────────────────────────────────────────╮'),\n        R('div', { style:{ color:'#94A3B8' } }, '│  ',R('span',{style:{color:'#E2E8F0'}},'Claude Code'),'  ·  ',R('span',{style:{color:'#0084FF'}},'figma'),' MCP connected      │'),\n        R('div', { style:{ color:'#94A3B8' } }, '╰─────────────────────────────────────────╯'),\n        R('div', { style:{ marginTop:'18px' } },\n          R('span', { style:{ color:'#22C55E' } }, '> '),\n          R('span', null, typed),\n          caretOn ? R('span', { style:{ background:'#E2E8F0', color:'#0F172A', marginLeft:'1px' } }, '\\u2588') : null\n        ),\n        mcpIn > 0.01 ? R('div', { style:{ marginTop:'22px', opacity:mcpIn } },\n          R('span', { style:{ color:'#94A3B8' } }, '⏺ '),\n          R('span', { style:{ color:'#0084FF', fontWeight:700 } }, 'figma'),\n          R('span', { style:{ color:'#94A3B8' } }, '('),\n          R('span', { style:{ color:'#FBBF24' } }, 'get_design_context'),\n          R('span', { style:{ color:'#94A3B8' } }, ')')\n        ) : null,\n        mcpIn > 0.4 ? R('div', { style:{ marginTop:'8px', color:'#64748B', fontSize:'15px', opacity:cl((mcpIn-0.4)/0.6) } }, '  ⎿  Reading frame, layers, variables…') : null\n      )\n    ),\n\n    // BOTTOM caption\n    R('div', { style:{ position:'absolute', left:0, right:0, bottom:'80px', textAlign:'center', fontSize:'34px', fontWeight:700, color:'#111928', opacity:ease(cl((f-200)/30)) } },\n      'One prompt. One URL. One ',\n      R('span', { style:{ background:grad, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' } }, 'MCP'),\n      ' tool.'\n    )\n  );\n}"
+    },
+    "SceneContext": {
+      "type": "inline",
+      "code": "function SceneContext(props){var R=React.createElement;\nvar cl=function(x){return Math.max(0,Math.min(1,x));};\nvar ease=function(t){return 1-Math.pow(1-t,3);};\nvar easeIn=function(t){return t*t*t;};\nvar easeInOut=function(t){return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;};\nvar easeBack=function(t){var c1=1.70158;var c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);};\nvar lerp=function(a,b,t){return a+(b-a)*t;};\nvar grad='linear-gradient(90deg,#0084FF,#1A56DB)';\n  var END=540;\n  var f=props.frame||0;\n  var sceneIn  = ease(cl(f/26));\n  var sceneOut = easeIn(cl((f-(END-26))/26));\n  var sceneOp  = sceneIn - sceneOut;\n\n  // Lines reveal in sequence (each line line-by-line typewriter)\n  var lines = [\n    { txt:'Frame \"Charts Cover\" (1920×1080)',                    color:'#E2E8F0', bold:true,  delay:0   },\n    { txt:'  Auto-layout: vertical · gap 24 · padding 56',        color:'#94A3B8', delay:18  },\n    { txt:'  Fill: var(--color-surface)',                          color:'#94A3B8', delay:36  },\n    { txt:'  Border: 1px var(--color-border) · radius 14',         color:'#94A3B8', delay:54  },\n    { txt:'  Children:',                                            color:'#94A3B8', delay:78  },\n    { txt:'    Eyebrow \"DATA VISUALIZATION\" · weight 700 · 14px',  color:'#22C55E', delay:96  },\n    { txt:'    Heading \"Graphs & Charts Kit\" · 72px · color text-primary', color:'#22C55E', delay:120 },\n    { txt:'    Subheading 22px · color text-secondary',            color:'#22C55E', delay:144 },\n    { txt:'    Component <Badge variant=\"info\"> \"1920 × 1080\"',    color:'#FBBF24', delay:168 },\n    { txt:'    Component <Badge variant=\"brand\"> \"Auto-layout\"',   color:'#FBBF24', delay:188 },\n    { txt:'    Component <Badge variant=\"muted\"> \"24 components\"', color:'#FBBF24', delay:208 },\n    { txt:'  Right region:',                                        color:'#94A3B8', delay:232 },\n    { txt:'    Grid 3×2 · gap 18 · cards [Revenue, Users, …]',     color:'#0084FF', delay:252 },\n    { txt:'    Card: padding 16 · radius 12 · border subtle',       color:'#0084FF', delay:272 },\n    { txt:'    Chart: bar | line | donut · palette[6]',             color:'#0084FF', delay:292 },\n    { txt:'  Variables:',                                           color:'#94A3B8', delay:316 },\n    { txt:'    --brand-500: #0084FF · --brand-700: #1A56DB',        color:'#A78BFA', delay:336 },\n    { txt:'    --text-primary: #111928 · --text-muted: #6B7280',    color:'#A78BFA', delay:356 },\n    { txt:'',                                                       color:'#94A3B8', delay:380 },\n    { txt:'✓ design context returned · 96 layers · 18 variables',   color:'#22C55E', bold:true, delay:404 },\n  ];\n\n  function renderLine(L,i){\n    var t = cl((f - L.delay) / 14);\n    if (t <= 0) return null;\n    var chars = Math.floor(L.txt.length * ease(t));\n    var shown = L.txt.slice(0, chars);\n    return R('div', { key:i, style:{ color:L.color, fontWeight:L.bold?700:400, opacity:t<1?(0.5+0.5*t):1, minHeight:'1.6em' } }, shown);\n  }\n\n  // Callouts: appear over the terminal at the right times\n  var callouts = [\n    { label:'Layout',     start:96,  side:'right' },\n    { label:'Typography', start:160, side:'right' },\n    { label:'Colors',     start:336, side:'right' },\n    { label:'Spacing',    start:36,  side:'left'  },\n    { label:'Badges',     start:208, side:'left'  },\n    { label:'Cards',      start:272, side:'left'  },\n  ];\n  function calloutEl(c, i){\n    var t = ease(cl((f - c.start) / 18));\n    if (t < 0.02) return null;\n    var fade = 1 - cl((f - (c.start + 90)) / 24);\n    var op = Math.max(0, Math.min(t, fade));\n    if (op < 0.02) return null;\n    var top = 140 + i*100;\n    var common = { position:'absolute', top:top+'px', opacity:op, fontFamily:'Inter', fontWeight:700, fontSize:'22px', padding:'10px 22px', borderRadius:'999px', background:'#FFFFFF', color:'#111928', boxShadow:'0 8px 22px rgba(17,25,40,0.10)', border:'1.5px solid #E5E7EB' };\n    if (c.side==='right') common.right = (60 + (1-t)*-20) + 'px';\n    else                  common.left  = (60 + (1-t)*-20) + 'px';\n    return R('div', { key:i, style:common },\n      R('span', { style:{ display:'inline-block', width:'10px', height:'10px', borderRadius:'50%', background:'#0084FF', marginRight:'10px', verticalAlign:'middle' } }),\n      c.label\n    );\n  }\n\n  return R('div', { style:{ width:'100%', height:'100%', background:'#0B1120', opacity:sceneOp, fontFamily:'Inter', position:'relative', display:'flex', alignItems:'center', justifyContent:'center' } },\n    R('div', { style:{ width:'1380px', background:'#0F172A', borderRadius:'14px', boxShadow:'0 30px 70px rgba(0,0,0,0.5)', overflow:'hidden', border:'1px solid #1E293B' } },\n      R('div', { style:{ height:'42px', background:'#1E293B', display:'flex', alignItems:'center', padding:'0 14px', gap:'6px' } },\n        R('div', { style:{ width:11, height:11, borderRadius:'50%', background:'#FF5F57' } }),\n        R('div', { style:{ width:11, height:11, borderRadius:'50%', background:'#FEBC2E' } }),\n        R('div', { style:{ width:11, height:11, borderRadius:'50%', background:'#28C840' } }),\n        R('div', { style:{ marginLeft:'14px', fontSize:'13px', color:'#94A3B8' } }, 'figma MCP · get_design_context')\n      ),\n      R('div', { style:{ padding:'34px 44px', fontFamily:'JetBrains Mono, monospace', fontSize:'19px', lineHeight:1.55, color:'#E2E8F0', minHeight:'780px' } },\n        lines.map(renderLine)\n      )\n    ),\n    callouts.map(calloutEl)\n  );\n}"
+    },
+    "SceneGeneration": {
+      "type": "inline",
+      "code": "function SceneGeneration(props){var R=React.createElement;\nvar cl=function(x){return Math.max(0,Math.min(1,x));};\nvar ease=function(t){return 1-Math.pow(1-t,3);};\nvar easeIn=function(t){return t*t*t;};\nvar easeInOut=function(t){return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;};\nvar easeBack=function(t){var c1=1.70158;var c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);};\nvar lerp=function(a,b,t){return a+(b-a)*t;};\nvar grad='linear-gradient(90deg,#0084FF,#1A56DB)';\n  var END=600;\n  var f=props.frame||0;\n  var sceneIn  = ease(cl(f/26));\n  var sceneOut = easeIn(cl((f-(END-26))/26));\n  var sceneOp  = sceneIn - sceneOut;\n\n  // Sequence:\n  //  0-120:  Write(src/Cover.jsx) progress count up to 252\n  //  120-240: npm install lines\n  //  240-360: vite build output\n  //  360-480: dev server boot box\n  //  420-end: pill banner pops in\n  var writeT = cl(f/120);\n  var writeLines = Math.floor(writeT * 252);\n\n  var npmStart = 120;\n  var npmLines = [\n    'added 184 packages in 6.2s',\n    '',\n    '  3 packages are looking for funding',\n  ];\n\n  var viteStart = 240;\n  var viteLines = [\n    '> vite build',\n    '',\n    'vite v6.4.1 building for production…',\n    '✓ 42 modules transformed.',\n    'dist/index.html                    0.46 kB │ gzip:  0.31 kB',\n    'dist/assets/index-7f3a.css        12.84 kB │ gzip:  3.12 kB',\n    'dist/assets/index-c0a1.js         148.92 kB │ gzip: 48.71 kB',\n    '✓ built in 1.42s',\n  ];\n\n  var devStart = 380;\n  var devIn = ease(cl((f-devStart)/26));\n\n  var pillStart = 420;\n  var pillIn = easeBack(cl((f-pillStart)/30));\n\n  function lineEl(text, color, delay, bold){\n    var t = cl((f - delay) / 14);\n    if (t <= 0) return null;\n    var chars = Math.floor(text.length * ease(t));\n    return R('div', { style:{ color:color, fontWeight:bold?700:400, opacity:t<1?(0.5+0.5*t):1, minHeight:'1.5em' } }, text.slice(0, chars));\n  }\n\n  return R('div', { style:{ width:'100%', height:'100%', background:'#0B1120', opacity:sceneOp, fontFamily:'Inter', position:'relative', display:'flex', alignItems:'center', justifyContent:'center' } },\n    R('div', { style:{ width:'1500px', background:'#0F172A', borderRadius:'14px', boxShadow:'0 30px 70px rgba(0,0,0,0.5)', overflow:'hidden', border:'1px solid #1E293B' } },\n      R('div', { style:{ height:'42px', background:'#1E293B', display:'flex', alignItems:'center', padding:'0 14px', gap:'6px' } },\n        R('div', { style:{ width:11, height:11, borderRadius:'50%', background:'#FF5F57' } }),\n        R('div', { style:{ width:11, height:11, borderRadius:'50%', background:'#FEBC2E' } }),\n        R('div', { style:{ width:11, height:11, borderRadius:'50%', background:'#28C840' } }),\n        R('div', { style:{ marginLeft:'14px', fontSize:'13px', color:'#94A3B8' } }, 'claude — generation')\n      ),\n      R('div', { style:{ padding:'34px 44px', fontFamily:'JetBrains Mono, monospace', fontSize:'18px', lineHeight:1.55, color:'#E2E8F0', minHeight:'780px' } },\n        // Write step\n        R('div', { style:{ color:'#94A3B8' } }, '⏺ ', R('span', { style:{ color:'#E2E8F0' } }, 'Write'), '(', R('span', { style:{ color:'#FBBF24' } }, 'src/Cover.jsx'), ')'),\n        R('div', { style:{ color:'#22C55E', marginLeft:'18px' } }, '  ⎿  Wrote ', R('span', { style:{ fontWeight:700 } }, writeLines), ' lines'),\n\n        // npm install\n        f >= npmStart ? R('div', { style:{ marginTop:'18px' } },\n          R('div', { style:{ color:'#94A3B8' } }, '$ ', R('span', { style:{ color:'#E2E8F0' } }, 'npm install')),\n          npmLines.map(function(l,i){ return lineEl(l, '#94A3B8', npmStart + 16 + i*10, false); })\n        ) : null,\n\n        // vite build\n        f >= viteStart ? R('div', { style:{ marginTop:'18px' } },\n          R('div', { style:{ color:'#94A3B8' } }, '$ ', R('span', { style:{ color:'#E2E8F0' } }, 'npm run build')),\n          viteLines.map(function(l,i){\n            var color = l.indexOf('✓')===0 ? '#22C55E' : (l.indexOf('dist/')===0 ? '#A78BFA' : '#94A3B8');\n            return lineEl(l, color, viteStart + 12 + i*8, l.indexOf('✓')===0);\n          })\n        ) : null,\n\n        // dev server boot box\n        devIn > 0.02 ? R('div', { style:{ marginTop:'24px', opacity:devIn, transform:'translateY('+((1-devIn)*8)+'px)' } },\n          R('div', { style:{ display:'inline-block', background:'rgba(34,197,94,0.10)', border:'1px solid rgba(34,197,94,0.30)', borderRadius:'10px', padding:'14px 24px' } },\n            R('div', { style:{ color:'#22C55E', fontWeight:700 } }, '  VITE v6.4.1  ready in 312 ms'),\n            R('div', { style:{ marginTop:'6px' } }, R('span', { style:{ color:'#94A3B8' } }, '  ➜  Local:   '), R('span', { style:{ color:'#E2E8F0' } }, 'http://localhost:5173/'))\n          )\n        ) : null\n      )\n    ),\n\n    // pill banner (top)\n    pillIn > 0.02 ? R('div', { style:{ position:'absolute', top:'80px', left:'50%', transform:'translateX(-50%) scale('+(0.95+0.05*pillIn)+')', opacity:cl(pillIn), background:'#FFFFFF', borderRadius:'999px', padding:'14px 28px', display:'flex', alignItems:'center', gap:'14px', boxShadow:'0 14px 36px rgba(0,0,0,0.30)', fontFamily:'Inter', fontSize:'22px', fontWeight:700, color:'#111928' } },\n      R('span', { style:{ background:grad, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' } }, 'React'),\n      R('span', { style:{ color:'#CBD5E1' } }, '·'),\n      R('span', { style:{ background:grad, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' } }, 'Tailwind'),\n      R('span', { style:{ color:'#CBD5E1' } }, '·'),\n      R('span', { style:{ background:grad, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' } }, 'Vite'),\n      R('span', { style:{ color:'#6B7280', fontWeight:500, marginLeft:'6px' } }, '— scaffolded & built')\n    ) : null\n  );\n}"
+    },
+    "SceneReveal": {
+      "type": "inline",
+      "code": "function SceneReveal(props){var R=React.createElement;\nvar cl=function(x){return Math.max(0,Math.min(1,x));};\nvar ease=function(t){return 1-Math.pow(1-t,3);};\nvar easeIn=function(t){return t*t*t;};\nvar easeInOut=function(t){return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;};\nvar easeBack=function(t){var c1=1.70158;var c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);};\nvar lerp=function(a,b,t){return a+(b-a)*t;};\nvar grad='linear-gradient(90deg,#0084FF,#1A56DB)';\n  var END=420;\n  var f=props.frame||0;\n  var sceneIn  = ease(cl(f/26));\n  var sceneOut = easeIn(cl((f-(END-26))/26));\n  var sceneOp  = sceneIn - sceneOut;\n\n  // Two cards slide in from sides\n  var leftIn  = ease(cl(f/30));\n  var rightIn = ease(cl((f-15)/30));\n\n  // Big stamp: \"Pixel-perfect. First try.\"\n  var stampIn = easeBack(cl((f-160)/26));\n  var stampPulse = 1 + 0.03 * Math.sin(cl((f-200)/40)*Math.PI);\n\n  // Mini chart palette\n  var palette = ['#0084FF','#1A56DB','#22C55E','#F59E0B','#EF4444','#8B5CF6'];\n\n  // Tiny shared \"Charts Cover\" preview\n  function preview(seed){\n    function bars(s){\n      var arr=[]; for(var i=0;i<6;i++){ var h = 8 + ((s*7 + i*13) % 32); arr.push(R('div',{key:i,style:{width:'6px',height:h+'px',background:palette[(s+i)%palette.length],borderRadius:'1px'}})); }\n      return R('div',{style:{display:'flex',alignItems:'flex-end',gap:'2px',height:'40px'}},arr);\n    }\n    function donut(s){\n      var p=0.4+((s*7)%40)/100; var c=2*Math.PI*16;\n      return R('svg',{width:46,height:46,viewBox:'0 0 46 46'},\n        R('circle',{cx:23,cy:23,r:16,fill:'none',stroke:'#E5E7EB',strokeWidth:5}),\n        R('circle',{cx:23,cy:23,r:16,fill:'none',stroke:palette[s%palette.length],strokeWidth:5,strokeDasharray:c,strokeDashoffset:c*(1-p),transform:'rotate(-90 23 23)',strokeLinecap:'round'})\n      );\n    }\n    function card(i,kind,title){\n      return R('div',{key:i,style:{background:'#FFFFFF',border:'1px solid #E5E7EB',borderRadius:'8px',padding:'10px',display:'flex',flexDirection:'column',justifyContent:'space-between',minHeight:'72px'}},\n        R('div',{style:{fontSize:'9px',fontWeight:700,color:'#6B7280',letterSpacing:'0.05em',textTransform:'uppercase'}},title),\n        R('div',{style:{display:'flex',justifyContent:'center',alignItems:'flex-end'}}, kind===0?bars(i+seed):donut(i+seed))\n      );\n    }\n    return R('div',{style:{width:'100%',height:'100%',background:'#FFFFFF',padding:'24px',display:'flex',flexDirection:'column',gap:'14px'}},\n      R('div',null,\n        R('div',{style:{fontSize:'10px',fontWeight:700,color:'#0084FF',letterSpacing:'0.12em'}},'DATA VISUALIZATION'),\n        R('div',{style:{fontSize:'30px',fontWeight:800,lineHeight:1.05,color:'#111928',marginTop:'4px'}},'Graphs & Charts ',R('span',{style:{background:grad,WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text'}},'Kit'))\n      ),\n      R('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'10px',flex:'1 1 auto'}},\n        card(0,0,'Revenue'),card(1,1,'Users'),card(2,0,'Conversion'),\n        card(3,0,'MRR'),card(4,1,'Sessions'),card(5,0,'Retention')\n      )\n    );\n  }\n\n  return R('div', { style:{ width:'100%', height:'100%', background:'#F9FAFB', opacity:sceneOp, fontFamily:'Inter', position:'relative' } },\n    // LEFT card — labelled \"Figma\"\n    R('div', { style:{ position:'absolute', left:'70px', top:'120px', width:'860px', height:'820px', borderRadius:'16px', boxShadow:'0 24px 50px rgba(17,25,40,0.10)', background:'#FFFFFF', overflow:'hidden', border:'1px solid #E5E7EB', opacity:leftIn, transform:'translateX('+((1-leftIn)*-40)+'px)' } },\n      R('div', { style:{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 22px', borderBottom:'1px solid #F3F4F6' } },\n        R('div', { style:{ display:'flex', alignItems:'center', gap:'8px', fontSize:'14px', fontWeight:700, color:'#111928' } },\n          R('span', { style:{ display:'inline-block', width:'10px', height:'10px', borderRadius:'2px', background:'#F24E1E' } }),\n          'Figma — design'\n        ),\n        R('div', { style:{ fontSize:'12px', fontWeight:600, color:'#6B7280', background:'#F3F4F6', padding:'4px 10px', borderRadius:'999px' } }, '1920 × 1080')\n      ),\n      R('div', { style:{ height:'calc(100% - 50px)' } }, preview(1))\n    ),\n\n    // RIGHT card — labelled \"localhost:5173\"\n    R('div', { style:{ position:'absolute', right:'70px', top:'120px', width:'860px', height:'820px', borderRadius:'16px', boxShadow:'0 24px 50px rgba(17,25,40,0.10)', background:'#FFFFFF', overflow:'hidden', border:'1px solid #E5E7EB', opacity:rightIn, transform:'translateX('+((1-rightIn)*40)+'px)' } },\n      R('div', { style:{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 22px', borderBottom:'1px solid #F3F4F6' } },\n        R('div', { style:{ display:'flex', alignItems:'center', gap:'8px', fontSize:'14px', fontWeight:700, color:'#111928' } },\n          R('span', { style:{ display:'inline-block', width:'10px', height:'10px', borderRadius:'50%', background:'#22C55E' } }),\n          'localhost:5173'\n        ),\n        R('div', { style:{ fontSize:'12px', fontWeight:600, color:'#1A56DB', background:'#EFF6FF', padding:'4px 10px', borderRadius:'999px' } }, 'React + Tailwind')\n      ),\n      R('div', { style:{ height:'calc(100% - 50px)' } }, preview(1))\n    ),\n\n    // Stamp overlay\n    stampIn > 0.02 ? R('div', { style:{ position:'absolute', left:0, right:0, top:'50%', transform:'translateY(-50%) scale('+(0.9+0.1*stampIn)+') scale('+stampPulse+') rotate(-2deg)', textAlign:'center', opacity:cl(stampIn) } },\n      R('div', { style:{ display:'inline-block', background:'#FFFFFF', padding:'24px 48px', borderRadius:'14px', boxShadow:'0 30px 70px rgba(0,0,0,0.20)', border:'2px solid #111928' } },\n        R('div', { style:{ fontSize:'72px', fontWeight:900, color:'#111928', lineHeight:1, letterSpacing:'-0.02em' } },\n          'Pixel-',\n          R('span', { style:{ background:grad, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' } }, 'perfect.'),\n          ' First try.'\n        )\n      )\n    ) : null\n  );\n}"
+    },
+    "SceneOutro": {
+      "type": "inline",
+      "code": "function SceneOutro(props){var R=React.createElement;\nvar cl=function(x){return Math.max(0,Math.min(1,x));};\nvar ease=function(t){return 1-Math.pow(1-t,3);};\nvar easeIn=function(t){return t*t*t;};\nvar easeInOut=function(t){return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;};\nvar easeBack=function(t){var c1=1.70158;var c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);};\nvar lerp=function(a,b,t){return a+(b-a)*t;};\nvar grad='linear-gradient(90deg,#0084FF,#1A56DB)';\n  var END=390;\n  var f=props.frame||0;\n  var sceneIn  = ease(cl(f/30));\n  var sceneOut = easeIn(cl((f-(END-30))/30));\n  var sceneOp  = sceneIn - sceneOut;\n\n  var l1In = ease(cl((f-20)/26));\n  var l2In = ease(cl((f-110)/24));\n  var l3In = ease(cl((f-200)/24));\n\n  // Underline draws under \"Figma\"\n  var underP = ease(cl((f-70)/30));\n\n  return R('div', { style:{ width:'100%', height:'100%', background:'#FFFFFF', opacity:sceneOp, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:'40px', fontFamily:'Inter' } },\n    R('div', { style:{ fontSize:'120px', fontWeight:900, color:'#111928', lineHeight:1.05, letterSpacing:'-0.02em', textAlign:'center', opacity:l1In, transform:'translateY('+((1-l1In)*20)+'px)' } },\n      'Claude Code reads ',\n      R('span', { style:{ position:'relative', display:'inline-block' } },\n        R('span', { style:{ background:grad, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' } }, 'Figma.'),\n        R('span', { style:{ position:'absolute', left:0, right:0, bottom:'-4px', height:'10px', borderRadius:'5px', background:grad, transform:'scaleX('+underP+')', transformOrigin:'left center' } })\n      )\n    ),\n    R('div', { style:{ fontSize:'42px', fontWeight:500, color:'#6B7280', opacity:l2In, transform:'translateY('+((1-l2In)*16)+'px)' } }, 'Try it on your next handoff.'),\n    R('div', { style:{ display:'flex', gap:'40px', marginTop:'24px', fontSize:'24px', fontWeight:600, opacity:l3In, transform:'translateY('+((1-l3In)*12)+'px)' } },\n      R('div', { style:{ display:'flex', alignItems:'center', gap:'10px', color:'#111928' } },\n        R('span', { style:{ display:'inline-block', width:'10px', height:'10px', borderRadius:'50%', background:'#0084FF' } }),\n        'claude.ai/code'\n      ),\n      R('div', { style:{ display:'flex', alignItems:'center', gap:'10px', color:'#111928' } },\n        R('span', { style:{ display:'inline-block', width:'10px', height:'10px', borderRadius:'2px', background:'#F24E1E' } }),\n        'figma.com/mcp'\n      )\n    )\n  );\n}"
+    },
+    "Watermark": {
+      "type": "inline",
+      "code": "function Watermark(props){var R=React.createElement;\n  return R('div', { style:{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', gap:'4px', opacity:0.7, fontFamily:'Inter', fontWeight:700, fontSize:'22px' } },\n    R('span', { style:{ color:'#111928' } }, 'Flow'),\n    R('span', { style:{ background:'linear-gradient(90deg,#0084FF,#1A56DB)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' } }, 'Hunt')\n  );\n}"
+    }
+  },
+  "inputs": [],
+  "composition": {
+    "scenes": [
+      {
+        "id": "s1-hook",
+        "startFrame": 0,
+        "endFrame": 240,
+        "backgroundColor": "#FFFFFF",
+        "transition": {
+          "type": "fade",
+          "duration": 18
+        },
+        "layers": [
+          {
+            "id": "s1-hook-layer",
+            "type": "custom",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "size": {
+              "width": 1920,
+              "height": 1080
+            },
+            "customComponent": {
+              "name": "SceneHook",
+              "props": {}
+            }
+          },
+          {
+            "id": "s1-hook-watermark",
+            "type": "custom",
+            "position": {
+              "x": 0,
+              "y": 1010
+            },
+            "size": {
+              "width": 1920,
+              "height": 50
+            },
+            "customComponent": {
+              "name": "Watermark",
+              "props": {}
+            }
+          }
+        ]
+      },
+      {
+        "id": "s2-design",
+        "startFrame": 240,
+        "endFrame": 600,
+        "backgroundColor": "#FFFFFF",
+        "transition": {
+          "type": "fade",
+          "duration": 18
+        },
+        "layers": [
+          {
+            "id": "s2-design-layer",
+            "type": "custom",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "size": {
+              "width": 1920,
+              "height": 1080
+            },
+            "customComponent": {
+              "name": "SceneDesign",
+              "props": {}
+            }
+          },
+          {
+            "id": "s2-design-watermark",
+            "type": "custom",
+            "position": {
+              "x": 0,
+              "y": 1010
+            },
+            "size": {
+              "width": 1920,
+              "height": 50
+            },
+            "customComponent": {
+              "name": "Watermark",
+              "props": {}
+            }
+          }
+        ]
+      },
+      {
+        "id": "s3-handoff",
+        "startFrame": 600,
+        "endFrame": 900,
+        "backgroundColor": "#FFFFFF",
+        "transition": {
+          "type": "fade",
+          "duration": 18
+        },
+        "layers": [
+          {
+            "id": "s3-handoff-layer",
+            "type": "custom",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "size": {
+              "width": 1920,
+              "height": 1080
+            },
+            "customComponent": {
+              "name": "SceneHandoff",
+              "props": {}
+            }
+          },
+          {
+            "id": "s3-handoff-watermark",
+            "type": "custom",
+            "position": {
+              "x": 0,
+              "y": 1010
+            },
+            "size": {
+              "width": 1920,
+              "height": 50
+            },
+            "customComponent": {
+              "name": "Watermark",
+              "props": {}
+            }
+          }
+        ]
+      },
+      {
+        "id": "s4-context",
+        "startFrame": 900,
+        "endFrame": 1440,
+        "backgroundColor": "#FFFFFF",
+        "transition": {
+          "type": "fade",
+          "duration": 18
+        },
+        "layers": [
+          {
+            "id": "s4-context-layer",
+            "type": "custom",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "size": {
+              "width": 1920,
+              "height": 1080
+            },
+            "customComponent": {
+              "name": "SceneContext",
+              "props": {}
+            }
+          },
+          {
+            "id": "s4-context-watermark",
+            "type": "custom",
+            "position": {
+              "x": 0,
+              "y": 1010
+            },
+            "size": {
+              "width": 1920,
+              "height": 50
+            },
+            "customComponent": {
+              "name": "Watermark",
+              "props": {}
+            }
+          }
+        ]
+      },
+      {
+        "id": "s5-generation",
+        "startFrame": 1440,
+        "endFrame": 2040,
+        "backgroundColor": "#FFFFFF",
+        "transition": {
+          "type": "fade",
+          "duration": 18
+        },
+        "layers": [
+          {
+            "id": "s5-generation-layer",
+            "type": "custom",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "size": {
+              "width": 1920,
+              "height": 1080
+            },
+            "customComponent": {
+              "name": "SceneGeneration",
+              "props": {}
+            }
+          },
+          {
+            "id": "s5-generation-watermark",
+            "type": "custom",
+            "position": {
+              "x": 0,
+              "y": 1010
+            },
+            "size": {
+              "width": 1920,
+              "height": 50
+            },
+            "customComponent": {
+              "name": "Watermark",
+              "props": {}
+            }
+          }
+        ]
+      },
+      {
+        "id": "s6-reveal",
+        "startFrame": 2040,
+        "endFrame": 2460,
+        "backgroundColor": "#FFFFFF",
+        "transition": {
+          "type": "fade",
+          "duration": 18
+        },
+        "layers": [
+          {
+            "id": "s6-reveal-layer",
+            "type": "custom",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "size": {
+              "width": 1920,
+              "height": 1080
+            },
+            "customComponent": {
+              "name": "SceneReveal",
+              "props": {}
+            }
+          },
+          {
+            "id": "s6-reveal-watermark",
+            "type": "custom",
+            "position": {
+              "x": 0,
+              "y": 1010
+            },
+            "size": {
+              "width": 1920,
+              "height": 50
+            },
+            "customComponent": {
+              "name": "Watermark",
+              "props": {}
+            }
+          }
+        ]
+      },
+      {
+        "id": "s7-outro",
+        "startFrame": 2460,
+        "endFrame": 2850,
+        "backgroundColor": "#FFFFFF",
+        "transition": {
+          "type": "fade",
+          "duration": 30
+        },
+        "layers": [
+          {
+            "id": "s7-outro-layer",
+            "type": "custom",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "size": {
+              "width": 1920,
+              "height": 1080
+            },
+            "customComponent": {
+              "name": "SceneOutro",
+              "props": {}
+            }
+          },
+          {
+            "id": "s7-outro-watermark",
+            "type": "custom",
+            "position": {
+              "x": 0,
+              "y": 1010
+            },
+            "size": {
+              "width": 1920,
+              "height": 50
+            },
+            "customComponent": {
+              "name": "Watermark",
+              "props": {}
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
