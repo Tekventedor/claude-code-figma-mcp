@@ -1,0 +1,5 @@
+{
+  "mcpServers": {
+    "rendervid": { "command": "node", "args": ["/Users/hugolewisplant/rendervid/mcp/build/index.js"] }
+  }
+}
