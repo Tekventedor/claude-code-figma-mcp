@@ -2,7 +2,9 @@
 
 Motion-graphics video promoting the FlowHunt blog post **"How to Use Claude Code with Figma MCP: A Complete Setup Guide"**. Built with [rendervid-engine](https://github.com/Tekventedor/rendervid-engine).
 
-- **Runtime:** ~95s
+Visual-first style, modeled after `mcp-in-action`: bold typography, gradient highlights, paired-pane choreography with narrator pills, morph hand-offs, FlowHunt CTA card.
+
+- **Runtime:** ~50s
 - **Resolution:** 1920×1080 @ 30fps
 - **Source blog:** `source-blog.md`
 - **Scene script:** `spec.md`
@@ -11,13 +13,11 @@ Motion-graphics video promoting the FlowHunt blog post **"How to Use Claude Code
 
 | # | Name | Frames | Runtime | Purpose |
 |---|------|--------|---------|---------|
-| 1 | Hook | 0–240 | 8s | "A designer hands you a Figma file…" — set the problem |
-| 2 | Open the design | 240–600 | 12s | Figma file with the data-viz cover frame |
-| 3 | Hand the URL to Claude Code | 600–900 | 10s | Split-screen: Figma URL → Claude Code prompt |
-| 4 | Design context dump | 900–1440 | 18s | Terminal scrolling structured design data |
-| 5 | Generation | 1440–2040 | 20s | Write file → npm install → vite build |
-| 6 | Reveal | 2040–2460 | 14s | Side-by-side: Figma vs running React component |
-| 7 | Outro / CTA | 2460–2850 | 13s | "Claude Code reads Figma." |
+| 1 | Hook        | 0–120     | 4s  | "Claude Code reads Figma." headline w/ underline draw |
+| 2 | Pivot       | 120–210   | 3s  | "Figma MCP" title card, "MCP" in gradient |
+| 3 | Pairing     | 210–780   | 19s | Figma canvas (left) + Claude Code → MCP → React code (right). Narrator pills, terminal-to-editor morph |
+| 4 | Reveal      | 780–1200  | 14s | Figma original vs running React component. "Pixel-perfect. First try." stamp |
+| 5 | CTA         | 1200–1500 | 10s | FlowHunt lockup, blog title, "Read the guide →" pill |
 
 ## Working with this project
 
