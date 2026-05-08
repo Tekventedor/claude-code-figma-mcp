@@ -17,10 +17,10 @@ const F = {
   hook:    { start: 0,    end: 120,  dur: 120 },  // 4s
   pivot:   { start: 120,  end: 210,  dur: 90  },  // 3s
   pairing: { start: 210,  end: 570,  dur: 360 },  // 12s — terminal lands ~3.3s in, faster typing/streaming
-  reveal:  { start: 570,  end: 990,  dur: 420 },  // 14s — Cover.jsx code reveal
-  cta:     { start: 990,  end: 1290, dur: 300 },  // 10s
+  reveal:  { start: 570,  end: 780,  dur: 210 },  // 7s — Cover.jsx code reveal (cut more, faster streaming)
+  cta:     { start: 780,  end: 1080, dur: 300 },  // 10s
 };
-const TOTAL_FRAMES = 1290;
+const TOTAL_FRAMES = 1080;
 const TOTAL_SECONDS = TOTAL_FRAMES / FPS;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -168,7 +168,7 @@ const PairingScene = `function PairingScene(props){${HELPERS}
   return R('div',{style:{width:'100%',height:'100%',background:'#F3F4F6',fontFamily:'Inter,system-ui,sans-serif',position:'relative',overflow:'hidden',opacity:op}},
 
     // ─── LEFT — Figma window
-    R('div',{style:{position:'absolute',left:'40px',top:'40px',width:'900px',height:'940px',background:'#FFFFFF',borderRadius:'10px',boxShadow:'0 24px 50px rgba(17,25,40,0.10)',overflow:'hidden',opacity:figmaIn,transform:'translateX('+(-30*(1-figmaIn))+'px)'}},
+    R('div',{style:{position:'absolute',left:'40px',top:'30px',width:'900px',height:'880px',background:'#FFFFFF',borderRadius:'10px',boxShadow:'0 24px 50px rgba(17,25,40,0.10)',overflow:'hidden',opacity:figmaIn,transform:'translateX('+(-30*(1-figmaIn))+'px)'}},
       // Browser chrome
       R('div',{style:{height:'34px',background:'#E8EAF0',borderBottom:'1px solid #D1D5DB',display:'flex',alignItems:'center',padding:'0 12px',gap:'10px'}},
         R('div',{style:{width:11,height:11,borderRadius:'50%',background:'#FF5F57'}}),
@@ -258,7 +258,7 @@ const PairingScene = `function PairingScene(props){${HELPERS}
     ),
 
     // ─── RIGHT — Claude Code terminal
-    termIn>0.005 ? R('div',{style:{position:'absolute',right:'40px',top:'40px',width:'900px',height:'940px',background:'#0F172A',borderRadius:'10px',boxShadow:'0 24px 50px rgba(17,25,40,0.18)',overflow:'hidden',opacity:termIn,transform:'translateX('+(40*(1-termIn))+'px)'}},
+    termIn>0.005 ? R('div',{style:{position:'absolute',right:'40px',top:'30px',width:'900px',height:'880px',background:'#0F172A',borderRadius:'10px',boxShadow:'0 24px 50px rgba(17,25,40,0.18)',overflow:'hidden',opacity:termIn,transform:'translateX('+(40*(1-termIn))+'px)'}},
       R('div',{style:{height:'34px',background:'#1E293B',display:'flex',alignItems:'center',padding:'0 12px',gap:'10px'}},
         R('div',{style:{width:11,height:11,borderRadius:'50%',background:'#FF5F57'}}),
         R('div',{style:{width:11,height:11,borderRadius:'50%',background:'#FEBC2E'}}),
@@ -288,7 +288,7 @@ const PairingScene = `function PairingScene(props){${HELPERS}
     ) : null,
 
     // ─── Single narrator pill
-    pillP>0.005 ? R('div',{style:{position:'absolute',left:'50%',top:'8px',transform:'translateX(-50%) translateY('+(8*(1-pillP))+'px)',opacity:pillP,background:'#FFFFFF',border:'1.5px solid #E5E7EB',borderRadius:'999px',padding:'10px 24px',fontSize:'18px',fontWeight:600,color:'#111928',boxShadow:'0 8px 22px rgba(17,25,40,0.12)',pointerEvents:'none',whiteSpace:'nowrap',zIndex:10}},'One URL.  One MCP call.  Real design data.') : null
+    pillP>0.005 ? R('div',{style:{position:'absolute',left:'50%',top:'935px',transform:'translateX(-50%) translateY('+(-8*(1-pillP))+'px)',opacity:pillP,background:'#FFFFFF',border:'1.5px solid #E5E7EB',borderRadius:'999px',padding:'10px 24px',fontSize:'18px',fontWeight:600,color:'#111928',boxShadow:'0 8px 22px rgba(17,25,40,0.12)',pointerEvents:'none',whiteSpace:'nowrap',zIndex:10}},'One URL.  One MCP call.  Real design data.') : null
   );
 }`;
 
@@ -300,53 +300,53 @@ const PairingScene = `function PairingScene(props){${HELPERS}
  * ========================================================================== */
 const RevealScene = `function RevealScene(props){${HELPERS}
   var f=props.frame||0;
-  var END=420;
-  var sceneIn=ease(cl(f/26));
+  var END=210;
+  var sceneIn=ease(cl(f/22));
   var sceneOut=easeIn(cl((f-(END-26))/26));
   var op=sceneIn-sceneOut;
 
-  var editorIn=ease(cl(f/22));
-  var titleIn=ease(cl((f-26)/20));
-  var titleOut=easeIn(cl((f-200)/18));
-  var checkIn=easeBack(cl((f-232)/22));
+  var editorIn=ease(cl(f/20));
+  var titleIn=ease(cl((f-22)/18));
+  var titleOut=easeIn(cl((f-130)/16));
+  var checkIn=easeBack(cl((f-160)/20));
 
   // Cover.jsx — generated from the Figma frame (more substantive than before:
   // includes chart-asset URL constants pulled from MCP, more JSX detail)
   var codeLines=[
     {parts:[['#94A3B8','// Cover.jsx — generated from your Figma frame']], d:2},
-    {parts:[['','']], d:8},
-    {parts:[['#C084FC','import'],['#E2E8F0',' React '],['#C084FC','from'],['#FBBF24'," 'react'"],['#94A3B8',';']], d:10},
-    {parts:[['#C084FC','import'],['#E2E8F0',' { '],['#22D3EE','FigmaLogo'],['#E2E8F0',' } '],['#C084FC','from'],['#FBBF24'," './FigmaLogo'"],['#94A3B8',';']], d:18},
-    {parts:[['#C084FC','import'],['#E2E8F0',' { '],['#22D3EE','ChartCard'],['#E2E8F0',' } '],['#C084FC','from'],['#FBBF24'," './ChartCard'"],['#94A3B8',';']], d:26},
-    {parts:[['','']], d:32},
-    {parts:[['#C084FC','const'],['#E2E8F0',' featurePills '],['#94A3B8','= [']], d:36},
-    {parts:[['#FBBF24',"  'Customizable', 'AutoLayout V4!', 'Graphs', 'Data', 'Styles'"]], d:44},
-    {parts:[['#94A3B8','];']], d:52},
-    {parts:[['','']], d:58},
-    {parts:[['#C084FC','const'],['#E2E8F0',' chartCards '],['#94A3B8','= [']], d:62},
-    {parts:[['#94A3B8','  { '],['#22D3EE','id'],['#94A3B8',": '"],['#FBBF24','bar-1'],['#94A3B8',"', "],['#22D3EE','src'],['#94A3B8',": '"],['#FBBF24','/assets/210daa94.png'],['#94A3B8',"', "],['#22D3EE','kind'],['#94A3B8',": '"],['#FBBF24','bars'],['#94A3B8',"' },"]], d:70},
-    {parts:[['#94A3B8','  { '],['#22D3EE','id'],['#94A3B8',": '"],['#FBBF24','donut-1'],['#94A3B8',"', "],['#22D3EE','src'],['#94A3B8',": '"],['#FBBF24','/assets/bde24fc0.png'],['#94A3B8',"', "],['#22D3EE','kind'],['#94A3B8',": '"],['#FBBF24','donut'],['#94A3B8',"' },"]], d:78},
-    {parts:[['#94A3B8','  { '],['#22D3EE','id'],['#94A3B8',": '"],['#FBBF24','line-1'],['#94A3B8',"', "],['#22D3EE','src'],['#94A3B8',": '"],['#FBBF24','/assets/b81b9224.png'],['#94A3B8',"', "],['#22D3EE','kind'],['#94A3B8',": '"],['#FBBF24','line'],['#94A3B8',"' },"]], d:86},
-    {parts:[['#475569','  /* …6 more chart cards wired to MCP assets */']], d:94},
-    {parts:[['#94A3B8','];']], d:102},
-    {parts:[['','']], d:108},
-    {parts:[['#C084FC','export function'],['#22D3EE',' Cover'],['#94A3B8','() {']], d:112},
-    {parts:[['#E2E8F0','  '],['#C084FC','return'],['#94A3B8',' (']], d:120},
-    {parts:[['#94A3B8','    <'],['#22D3EE','div'],['#E2E8F0',' '],['#FBBF24','className'],['#94A3B8','='],['#34D399','"bg-[#F0F2FF] min-h-screen p-12 grid grid-cols-2 gap-12"'],['#94A3B8','>']], d:128},
-    {parts:[['#94A3B8','      <'],['#22D3EE','div'],['#E2E8F0',' '],['#FBBF24','className'],['#94A3B8','='],['#34D399','"flex flex-col gap-6"'],['#94A3B8','>']], d:136},
-    {parts:[['#94A3B8','        <'],['#22D3EE','FigmaLogo'],['#94A3B8',' />']], d:144},
-    {parts:[['#94A3B8','        <'],['#22D3EE','p'],['#E2E8F0',' '],['#FBBF24','className'],['#94A3B8','='],['#34D399','"text-sm text-gray-500"'],['#94A3B8','>'],['#E2E8F0','Figma Template'],['#94A3B8','</'],['#22D3EE','p'],['#94A3B8','>']], d:152},
-    {parts:[['#94A3B8','        <'],['#22D3EE','h1'],['#E2E8F0',' '],['#FBBF24','className'],['#94A3B8','='],['#34D399','"text-7xl font-black text-[#1A1362]"'],['#94A3B8','>']], d:160},
-    {parts:[['#E2E8F0','          Data Visualization Graphs / Charts Kit']], d:168},
-    {parts:[['#94A3B8','        </'],['#22D3EE','h1'],['#94A3B8','>']], d:174},
-    {parts:[['#94A3B8','        <'],['#22D3EE','Pills'],['#E2E8F0',' '],['#FBBF24','items'],['#94A3B8','={featurePills} />']], d:180},
-    {parts:[['#94A3B8','      </'],['#22D3EE','div'],['#94A3B8','>']], d:186},
-    {parts:[['#94A3B8','      <'],['#22D3EE','ChartGrid'],['#E2E8F0',' '],['#FBBF24','items'],['#94A3B8','={chartCards} />']], d:192},
-    {parts:[['#94A3B8','    </'],['#22D3EE','div'],['#94A3B8','>']], d:198},
-    {parts:[['#94A3B8','  );']], d:204},
-    {parts:[['#94A3B8','}']], d:210},
+    {parts:[['','']], d:6},
+    {parts:[['#C084FC','import'],['#E2E8F0',' React '],['#C084FC','from'],['#FBBF24'," 'react'"],['#94A3B8',';']], d:8},
+    {parts:[['#C084FC','import'],['#E2E8F0',' { '],['#22D3EE','FigmaLogo'],['#E2E8F0',' } '],['#C084FC','from'],['#FBBF24'," './FigmaLogo'"],['#94A3B8',';']], d:14},
+    {parts:[['#C084FC','import'],['#E2E8F0',' { '],['#22D3EE','ChartCard'],['#E2E8F0',' } '],['#C084FC','from'],['#FBBF24'," './ChartCard'"],['#94A3B8',';']], d:20},
+    {parts:[['','']], d:24},
+    {parts:[['#C084FC','const'],['#E2E8F0',' featurePills '],['#94A3B8','= [']], d:28},
+    {parts:[['#FBBF24',"  'Customizable', 'AutoLayout V4!', 'Graphs', 'Data', 'Styles'"]], d:34},
+    {parts:[['#94A3B8','];']], d:40},
+    {parts:[['','']], d:44},
+    {parts:[['#C084FC','const'],['#E2E8F0',' chartCards '],['#94A3B8','= [']], d:48},
+    {parts:[['#94A3B8','  { '],['#22D3EE','id'],['#94A3B8',": '"],['#FBBF24','bar-1'],['#94A3B8',"', "],['#22D3EE','src'],['#94A3B8',": '"],['#FBBF24','/assets/210daa94.png'],['#94A3B8',"', "],['#22D3EE','kind'],['#94A3B8',": '"],['#FBBF24','bars'],['#94A3B8',"' },"]], d:54},
+    {parts:[['#94A3B8','  { '],['#22D3EE','id'],['#94A3B8',": '"],['#FBBF24','donut-1'],['#94A3B8',"', "],['#22D3EE','src'],['#94A3B8',": '"],['#FBBF24','/assets/bde24fc0.png'],['#94A3B8',"', "],['#22D3EE','kind'],['#94A3B8',": '"],['#FBBF24','donut'],['#94A3B8',"' },"]], d:60},
+    {parts:[['#94A3B8','  { '],['#22D3EE','id'],['#94A3B8',": '"],['#FBBF24','line-1'],['#94A3B8',"', "],['#22D3EE','src'],['#94A3B8',": '"],['#FBBF24','/assets/b81b9224.png'],['#94A3B8',"', "],['#22D3EE','kind'],['#94A3B8',": '"],['#FBBF24','line'],['#94A3B8',"' },"]], d:66},
+    {parts:[['#475569','  /* …6 more chart cards wired to MCP assets */']], d:72},
+    {parts:[['#94A3B8','];']], d:78},
+    {parts:[['','']], d:82},
+    {parts:[['#C084FC','export function'],['#22D3EE',' Cover'],['#94A3B8','() {']], d:86},
+    {parts:[['#E2E8F0','  '],['#C084FC','return'],['#94A3B8',' (']], d:92},
+    {parts:[['#94A3B8','    <'],['#22D3EE','div'],['#E2E8F0',' '],['#FBBF24','className'],['#94A3B8','='],['#34D399','"bg-[#F0F2FF] min-h-screen p-12 grid grid-cols-2 gap-12"'],['#94A3B8','>']], d:98},
+    {parts:[['#94A3B8','      <'],['#22D3EE','div'],['#E2E8F0',' '],['#FBBF24','className'],['#94A3B8','='],['#34D399','"flex flex-col gap-6"'],['#94A3B8','>']], d:104},
+    {parts:[['#94A3B8','        <'],['#22D3EE','FigmaLogo'],['#94A3B8',' />']], d:110},
+    {parts:[['#94A3B8','        <'],['#22D3EE','p'],['#E2E8F0',' '],['#FBBF24','className'],['#94A3B8','='],['#34D399','"text-sm text-gray-500"'],['#94A3B8','>'],['#E2E8F0','Figma Template'],['#94A3B8','</'],['#22D3EE','p'],['#94A3B8','>']], d:116},
+    {parts:[['#94A3B8','        <'],['#22D3EE','h1'],['#E2E8F0',' '],['#FBBF24','className'],['#94A3B8','='],['#34D399','"text-7xl font-black text-[#1A1362]"'],['#94A3B8','>']], d:122},
+    {parts:[['#E2E8F0','          Data Visualization Graphs / Charts Kit']], d:128},
+    {parts:[['#94A3B8','        </'],['#22D3EE','h1'],['#94A3B8','>']], d:134},
+    {parts:[['#94A3B8','        <'],['#22D3EE','Pills'],['#E2E8F0',' '],['#FBBF24','items'],['#94A3B8','={featurePills} />']], d:140},
+    {parts:[['#94A3B8','      </'],['#22D3EE','div'],['#94A3B8','>']], d:146},
+    {parts:[['#94A3B8','      <'],['#22D3EE','ChartGrid'],['#E2E8F0',' '],['#FBBF24','items'],['#94A3B8','={chartCards} />']], d:152},
+    {parts:[['#94A3B8','    </'],['#22D3EE','div'],['#94A3B8','>']], d:158},
+    {parts:[['#94A3B8','  );']], d:162},
+    {parts:[['#94A3B8','}']], d:166},
   ];
-  function lineOp(d){return ease(cl((f-d)/10));}
+  function lineOp(d){return ease(cl((f-d)/6));}
 
   return R('div',{style:{width:'100%',height:'100%',background:'#0B1220',fontFamily:'Inter,system-ui,sans-serif',position:'relative',opacity:op,padding:'40px',boxSizing:'border-box'}},
 
