@@ -17,10 +17,10 @@ const F = {
   hook:    { start: 0,    end: 120,  dur: 120 },  // 4s
   pivot:   { start: 120,  end: 210,  dur: 90  },  // 3s
   pairing: { start: 210,  end: 570,  dur: 360 },  // 12s — terminal lands ~3.3s in, faster typing/streaming
-  reveal:  { start: 570,  end: 780,  dur: 210 },  // 7s — Cover.jsx code reveal (cut more, faster streaming)
-  cta:     { start: 780,  end: 1080, dur: 300 },  // 10s
+  reveal:  { start: 570,  end: 735,  dur: 165 },  // 5.5s — Cover.jsx code reveal (cut another 0.5s, even faster streaming)
+  cta:     { start: 735,  end: 1035, dur: 300 },  // 10s
 };
-const TOTAL_FRAMES = 1080;
+const TOTAL_FRAMES = 1035;
 const TOTAL_SECONDS = TOTAL_FRAMES / FPS;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -100,27 +100,59 @@ const COVER_FRAME = `
   function _bars(s){var a=[];for(var i=0;i<5;i++){var h=4+((s*7+i*5)%14);a.push(R('div',{key:i,style:{width:'3px',height:h+'px',background:palette[(s+i)%palette.length]}}));}return R('div',{style:{display:'flex',alignItems:'flex-end',gap:'2px',height:'18px'}},a);}
   function _donut(s){var p=0.4+((s*7)%40)/100;var c=2*Math.PI*8;return R('svg',{width:24,height:24,viewBox:'0 0 24 24'},R('circle',{cx:12,cy:12,r:8,fill:'none',stroke:'#E5E7EB',strokeWidth:3}),R('circle',{cx:12,cy:12,r:8,fill:'none',stroke:palette[s%palette.length],strokeWidth:3,strokeDasharray:c,strokeDashoffset:c*(1-p),transform:'rotate(-90 12 12)',strokeLinecap:'round'}));}
   function _line(s){return R('svg',{width:30,height:18,viewBox:'0 0 30 18'},R('polyline',{points:'1,14 7,9 13,12 19,5 24,8 29,4',fill:'none',stroke:palette[s%palette.length],strokeWidth:2,strokeLinecap:'round'}));}
+  function _area(s){var c=palette[s%palette.length];return R('svg',{width:30,height:18,viewBox:'0 0 30 18'},R('path',{d:'M1,16 L1,12 L8,8 L14,11 L19,5 L24,8 L29,4 L29,16 Z',fill:c,fillOpacity:0.25,stroke:c,strokeWidth:1.5,strokeLinejoin:'round'}));}
+  function _scatter(s){var pts=[[3,12],[8,7],[12,10],[16,4],[20,8],[25,11],[28,6]];return R('svg',{width:30,height:18,viewBox:'0 0 30 18'},pts.map(function(p,i){return R('circle',{key:i,cx:p[0],cy:p[1],r:1.4,fill:palette[(s+i)%palette.length]});}));}
+  function _hbar(s){var a=[];for(var i=0;i<4;i++){var w=8+((s*5+i*7)%18);a.push(R('div',{key:i,style:{height:'2px',width:w+'px',background:palette[(s+i)%palette.length],borderRadius:'1px'}}));}return R('div',{style:{display:'flex',flexDirection:'column',gap:'2px',justifyContent:'center'}},a);}
+  function _metric(s){var nums=['+24%','$1.2k','98%','+9.3%','4.8★'];var labels=['GROWTH','REVENUE','UPTIME','YIELD','RATING'];var i=s%nums.length;return R('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'1px'}},R('div',{style:{fontSize:'12px',fontWeight:800,color:palette[s%palette.length],lineHeight:1,fontFamily:'Inter,system-ui'}},nums[i]),R('div',{style:{fontSize:'5px',color:'#6B7280',fontWeight:700,letterSpacing:'0.06em'}},labels[i]));}
+  function _calendar(s){var c=palette[s%palette.length];var cells=[];for(var i=0;i<28;i++){var op=0.15+((s*3+i*5)%5)/6;cells.push(R('div',{key:i,style:{width:'2.5px',height:'2.5px',background:c,opacity:op,borderRadius:'1px'}}));}return R('div',{style:{display:'grid',gridTemplateColumns:'repeat(7, 2.5px)',gridTemplateRows:'repeat(4, 2.5px)',gap:'1.5px'}},cells);}
+  function _spark(s){var c=palette[s%palette.length];return R('svg',{width:32,height:14,viewBox:'0 0 32 14'},R('polyline',{points:'1,11 5,9 9,10 13,6 17,7 21,4 25,5 31,2',fill:'none',stroke:c,strokeWidth:1.5,strokeLinecap:'round'}),R('circle',{cx:31,cy:2,r:1.6,fill:c}));}
   function _flogo(scale){var sz=scale||1;return R('div',{style:{width:(30*sz)+'px',height:(45*sz)+'px',display:'grid',gridTemplateColumns:'1fr 1fr',gridTemplateRows:'1fr 1fr 1fr',gap:0}},R('div',{style:{background:'#F24E1E',borderTopLeftRadius:'50%'}}),R('div',{style:{background:'#A259FF',borderTopRightRadius:'50%'}}),R('div',{style:{background:'#FF7262'}}),R('div',{style:{background:'#1ABCFE',borderRadius:'50%'}}),R('div',{style:{background:'#0ACF83',borderBottomLeftRadius:'50%'}}),R('div',{style:{background:'transparent'}}));}
-  function coverFrame(selOp){
+  function _fhLogo(){return R('svg',{width:34,height:28,viewBox:'0 0 275 223',fill:'none'},R('defs',null,R('linearGradient',{id:'fh_cover_g',x1:'0',y1:'0',x2:'275',y2:'223',gradientUnits:'userSpaceOnUse'},R('stop',{stopColor:'#0084FF'}),R('stop',{offset:'1',stopColor:'#1A56DB'}))),R('path',{d:'${FH_MARK_PATH}',fill:'url(#fh_cover_g)'}));}
+  function coverFrame(selOp, vertOp){
     selOp = (selOp == null) ? 0 : selOp;
+    var vertOpVal = (vertOp == null) ? 1 : vertOp;
     var dBlue = '#1A56DB';                       // darker blue for child frame borders
     function bdr(){ return selOp > 0.01 ? '1px solid '+dBlue : '1px solid transparent'; }
     function pillBdr(){ return selOp > 0.01 ? '1px solid '+dBlue : '1px solid #111928'; }
     function pillCol(){ return selOp > 0.5 ? dBlue : '#111928'; }
     function _ptag(t){return R('div',{style:{fontSize:'10px',fontWeight:600,color:pillCol(),padding:'3px 9px',border:pillBdr(),borderRadius:'4px',whiteSpace:'nowrap',background:'transparent'}},t);}
-    function _cell(i){var k=i%3;return R('div',{key:i,style:{background:'#FFFFFF',border:bdr(),borderRadius:'2px',display:'flex',alignItems:'center',justifyContent:'center'}},k===0?_bars(i+1):k===1?_donut(i+1):_line(i+1));}
-    return R('div',{style:{position:'relative',width:'100%',height:'100%',background:'#F0F2FF',padding:'18px',boxSizing:'border-box',display:'flex',gap:'14px',alignItems:'center'}},
-      // Left text block — wrapped with a sub-frame border
-      R('div',{style:{flex:'0 0 56%',display:'flex',flexDirection:'column',gap:'7px',padding:'4px',border:bdr(),borderRadius:'2px'}},
-        R('div',{style:{padding:'2px',border:bdr(),borderRadius:'2px',width:'34px'}}, _flogo(1)),
-        R('div',{style:{fontSize:'11px',color:'#6B7280',fontWeight:500,marginTop:'2px',padding:'1px 2px',border:bdr(),borderRadius:'2px',display:'inline-block',alignSelf:'flex-start'}},'Figma Template'),
-        R('div',{style:{fontSize:'19px',fontWeight:800,color:'#111928',lineHeight:1.05,padding:'1px 2px',border:bdr(),borderRadius:'2px',alignSelf:'flex-start'}},'Data Visualization'),
-        R('div',{style:{fontSize:'19px',fontWeight:800,color:'#111928',lineHeight:1.05,padding:'1px 2px',border:bdr(),borderRadius:'2px',alignSelf:'flex-start'}},'Graphs / Charts Kit'),
-        R('div',{style:{display:'flex',gap:'5px',marginTop:'5px',padding:'2px',border:bdr(),borderRadius:'2px',alignSelf:'flex-start'}}, _ptag('Customizable'), _ptag('AutoLayout V4!')),
-        R('div',{style:{display:'flex',gap:'5px',padding:'2px',border:bdr(),borderRadius:'2px',alignSelf:'flex-start'}}, _ptag('Graphs'), _ptag('Data'), _ptag('Styles'))
-      ),
-      // Right chart grid — sub-frame border + each cell border
-      R('div',{style:{flex:'1 1 auto',alignSelf:'stretch',display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gridTemplateRows:'1fr 1fr 1fr',gap:'4px',padding:'4px',border:bdr(),borderRadius:'2px'}}, [0,1,2,3,4,5,6,7,8].map(_cell))
+    // 9-cell mix: variety across charts plus a metric card, mini calendar/heatmap, and a sparkline
+    var chartTypes=['bars','metric','line','area','calendar','donut','spark','hbar','scatter'];
+    function _cell(i){
+      var t=chartTypes[i]||'bars';
+      var ch = t==='bars'?_bars(i+1)
+             : t==='donut'?_donut(i+1)
+             : t==='line'?_line(i+1)
+             : t==='area'?_area(i+1)
+             : t==='scatter'?_scatter(i+1)
+             : t==='hbar'?_hbar(i+1)
+             : t==='metric'?_metric(i+1)
+             : t==='calendar'?_calendar(i+1)
+             : t==='spark'?_spark(i+1)
+             : _bars(i+1);
+      return R('div',{key:i,style:{background:'#FFFFFF',border:bdr(),borderRadius:'2px',display:'flex',alignItems:'center',justifyContent:'center'}},ch);
+    }
+    // Single layout — elements absolutely positioned, lerping from horizontal
+    // coords to vertical coords so they actually slide/fold into their new
+    // positions instead of crossfading.
+    var p = vertOpVal;
+    var fontSub = Math.round(lerp(11, 12, p));
+    var fontH1 = Math.round(lerp(18, 22, p));
+    return R('div',{style:{position:'relative',width:'100%',height:'100%',background:'#F0F2FF',overflow:'hidden'}},
+      // FH logo — stays top-left
+      R('div',{key:'fh',style:{position:'absolute',left:lerp(14, 14, p)+'px',top:lerp(14, 14, p)+'px',padding:'2px',border:bdr(),borderRadius:'2px'}}, _fhLogo()),
+      // Subtitle
+      R('div',{key:'sub',style:{position:'absolute',left:lerp(14, 14, p)+'px',top:lerp(62, 66, p)+'px',fontSize:fontSub+'px',color:'#6B7280',fontWeight:500,padding:'1px 2px',border:bdr(),borderRadius:'2px',whiteSpace:'nowrap'}},'Subtitle'),
+      // Example Title (h1 line 1)
+      R('div',{key:'t1',style:{position:'absolute',left:lerp(14, 14, p)+'px',top:lerp(82, 90, p)+'px',fontSize:fontH1+'px',fontWeight:800,color:'#111928',lineHeight:1.05,padding:'1px 2px',border:bdr(),borderRadius:'2px',whiteSpace:'nowrap'}},'Example Title'),
+      // Demo Caption (h1 line 2)
+      R('div',{key:'t2',style:{position:'absolute',left:lerp(14, 14, p)+'px',top:lerp(104, 122, p)+'px',fontSize:fontH1+'px',fontWeight:800,color:'#111928',lineHeight:1.05,padding:'1px 2px',border:bdr(),borderRadius:'2px',whiteSpace:'nowrap'}},'Demo Caption'),
+      // Pill row 1
+      R('div',{key:'pr1',style:{position:'absolute',left:lerp(14, 14, p)+'px',top:lerp(138, 158, p)+'px',display:'flex',gap:'5px',padding:'2px',border:bdr(),borderRadius:'2px'}}, _ptag('Tag'), _ptag('Item')),
+      // Pill row 2
+      R('div',{key:'pr2',style:{position:'absolute',left:lerp(14, 14, p)+'px',top:lerp(168, 190, p)+'px',display:'flex',gap:'5px',padding:'2px',border:bdr(),borderRadius:'2px'}}, _ptag('Label'), _ptag('Type'), _ptag('Variant')),
+      // Chart grid — folds from right side (horizontal) to bottom (vertical)
+      R('div',{key:'cg',style:{position:'absolute',left:lerp(260, 14, p)+'px',top:lerp(14, 224, p)+'px',width:lerp(206, 372, p)+'px',height:lerp(212, 282, p)+'px',display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gridTemplateRows:'1fr 1fr 1fr',gap:'4px',padding:'4px',border:bdr(),borderRadius:'2px',boxSizing:'border-box'}}, [0,1,2,3,4,5,6,7,8].map(_cell))
     );
   }
 `;
@@ -136,6 +168,12 @@ const PairingScene = `function PairingScene(props){${HELPERS}
   var ringIn=ease(cl((f-44)/24));
   var ringPulse=Math.sin(cl((f-44)/80)*Math.PI)*0.35+0.65;
   var inspectorIn=ease(cl((f-60)/30));
+
+  // Cover layout morph: starts horizontal, animates to vertical stacked
+  var morphStart=72, morphDur=36;
+  var morphP=easeInOut(cl((f-morphStart)/morphDur));
+  var coverW=Math.round(lerp(480, 400, morphP));
+  var coverH=Math.round(lerp(240, 520, morphP));
 
   // Right pane (Claude terminal) slides in early — another second sooner
   var termStart=100;
@@ -213,16 +251,17 @@ const PairingScene = `function PairingScene(props){${HELPERS}
         ),
         // Canvas
         R('div',{style:{flex:1,background:'#F0F2FF',position:'relative',overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center'}},
-          R('div',{style:{position:'relative',width:'440px',height:'220px'}},
+          R('div',{style:{position:'relative',width:coverW+'px',height:coverH+'px'}},
             // Cover label above frame
             R('div',{style:{position:'absolute',left:0,top:'-18px',fontSize:'10px',color:'#0084FF',fontWeight:600,opacity:ringIn}},'Cover'),
             // Selection ring
             R('div',{style:{position:'absolute',left:'-2px',top:'-2px',right:'-2px',bottom:'-2px',border:'2px solid #0084FF',opacity:ringIn,boxShadow:'0 0 0 1px rgba(0,132,255,'+(0.18*ringPulse)+')',pointerEvents:'none'}}),
             // Selection handles
             ['tl','tr','bl','br'].map(function(p){var s={position:'absolute',width:6,height:6,background:'#FFFFFF',border:'1.5px solid #0084FF',opacity:ringIn};if(p==='tl'){s.left=-5;s.top=-5;}else if(p==='tr'){s.right=-5;s.top=-5;}else if(p==='bl'){s.left=-5;s.bottom=-5;}else{s.right=-5;s.bottom=-5;}return R('div',{key:p,style:s});}),
-            coverFrame(ringIn),
+            coverFrame(ringIn, morphP),
             // Dimension badge below
-            R('div',{style:{position:'absolute',left:'50%',bottom:'-20px',transform:'translateX(-50%)',fontSize:'9px',color:'#FFFFFF',background:'#0084FF',padding:'2px 6px',borderRadius:'2px',opacity:ringIn,fontFamily:'Inter'}},'1920 × 960')
+            R('div',{style:{position:'absolute',left:'50%',bottom:'-18px',transform:'translateX(-50%)',fontSize:'10px',color:'#6B7280',fontWeight:500,opacity:ringIn,fontFamily:'Inter,system-ui,sans-serif'}},'1920 × 960'),
+            R('div',{style:{position:'absolute',left:'50%',bottom:'-36px',transform:'translateX(-50%)',fontSize:'9px',color:'#9CA3AF',fontStyle:'italic',opacity:ringIn,fontFamily:'Inter,system-ui,sans-serif',whiteSpace:'nowrap'}},'* illustrative example — not the actual frame contents')
           )
         ),
         // Inspector
@@ -300,53 +339,53 @@ const PairingScene = `function PairingScene(props){${HELPERS}
  * ========================================================================== */
 const RevealScene = `function RevealScene(props){${HELPERS}
   var f=props.frame||0;
-  var END=210;
-  var sceneIn=ease(cl(f/22));
+  var END=165;
+  var sceneIn=ease(cl(f/18));
   var sceneOut=easeIn(cl((f-(END-26))/26));
   var op=sceneIn-sceneOut;
 
-  var editorIn=ease(cl(f/20));
-  var titleIn=ease(cl((f-22)/18));
-  var titleOut=easeIn(cl((f-130)/16));
-  var checkIn=easeBack(cl((f-160)/20));
+  var editorIn=ease(cl(f/16));
+  var titleIn=ease(cl((f-18)/14));
+  var titleOut=easeIn(cl((f-88)/12));
+  var checkIn=easeBack(cl((f-110)/12));
 
   // Cover.jsx — generated from the Figma frame (more substantive than before:
   // includes chart-asset URL constants pulled from MCP, more JSX detail)
   var codeLines=[
     {parts:[['#94A3B8','// Cover.jsx — generated from your Figma frame']], d:2},
-    {parts:[['','']], d:6},
-    {parts:[['#C084FC','import'],['#E2E8F0',' React '],['#C084FC','from'],['#FBBF24'," 'react'"],['#94A3B8',';']], d:8},
-    {parts:[['#C084FC','import'],['#E2E8F0',' { '],['#22D3EE','FigmaLogo'],['#E2E8F0',' } '],['#C084FC','from'],['#FBBF24'," './FigmaLogo'"],['#94A3B8',';']], d:14},
-    {parts:[['#C084FC','import'],['#E2E8F0',' { '],['#22D3EE','ChartCard'],['#E2E8F0',' } '],['#C084FC','from'],['#FBBF24'," './ChartCard'"],['#94A3B8',';']], d:20},
-    {parts:[['','']], d:24},
-    {parts:[['#C084FC','const'],['#E2E8F0',' featurePills '],['#94A3B8','= [']], d:28},
-    {parts:[['#FBBF24',"  'Customizable', 'AutoLayout V4!', 'Graphs', 'Data', 'Styles'"]], d:34},
-    {parts:[['#94A3B8','];']], d:40},
-    {parts:[['','']], d:44},
-    {parts:[['#C084FC','const'],['#E2E8F0',' chartCards '],['#94A3B8','= [']], d:48},
-    {parts:[['#94A3B8','  { '],['#22D3EE','id'],['#94A3B8',": '"],['#FBBF24','bar-1'],['#94A3B8',"', "],['#22D3EE','src'],['#94A3B8',": '"],['#FBBF24','/assets/210daa94.png'],['#94A3B8',"', "],['#22D3EE','kind'],['#94A3B8',": '"],['#FBBF24','bars'],['#94A3B8',"' },"]], d:54},
-    {parts:[['#94A3B8','  { '],['#22D3EE','id'],['#94A3B8',": '"],['#FBBF24','donut-1'],['#94A3B8',"', "],['#22D3EE','src'],['#94A3B8',": '"],['#FBBF24','/assets/bde24fc0.png'],['#94A3B8',"', "],['#22D3EE','kind'],['#94A3B8',": '"],['#FBBF24','donut'],['#94A3B8',"' },"]], d:60},
-    {parts:[['#94A3B8','  { '],['#22D3EE','id'],['#94A3B8',": '"],['#FBBF24','line-1'],['#94A3B8',"', "],['#22D3EE','src'],['#94A3B8',": '"],['#FBBF24','/assets/b81b9224.png'],['#94A3B8',"', "],['#22D3EE','kind'],['#94A3B8',": '"],['#FBBF24','line'],['#94A3B8',"' },"]], d:66},
-    {parts:[['#475569','  /* …6 more chart cards wired to MCP assets */']], d:72},
-    {parts:[['#94A3B8','];']], d:78},
-    {parts:[['','']], d:82},
-    {parts:[['#C084FC','export function'],['#22D3EE',' Cover'],['#94A3B8','() {']], d:86},
-    {parts:[['#E2E8F0','  '],['#C084FC','return'],['#94A3B8',' (']], d:92},
-    {parts:[['#94A3B8','    <'],['#22D3EE','div'],['#E2E8F0',' '],['#FBBF24','className'],['#94A3B8','='],['#34D399','"bg-[#F0F2FF] min-h-screen p-12 grid grid-cols-2 gap-12"'],['#94A3B8','>']], d:98},
-    {parts:[['#94A3B8','      <'],['#22D3EE','div'],['#E2E8F0',' '],['#FBBF24','className'],['#94A3B8','='],['#34D399','"flex flex-col gap-6"'],['#94A3B8','>']], d:104},
-    {parts:[['#94A3B8','        <'],['#22D3EE','FigmaLogo'],['#94A3B8',' />']], d:110},
-    {parts:[['#94A3B8','        <'],['#22D3EE','p'],['#E2E8F0',' '],['#FBBF24','className'],['#94A3B8','='],['#34D399','"text-sm text-gray-500"'],['#94A3B8','>'],['#E2E8F0','Figma Template'],['#94A3B8','</'],['#22D3EE','p'],['#94A3B8','>']], d:116},
-    {parts:[['#94A3B8','        <'],['#22D3EE','h1'],['#E2E8F0',' '],['#FBBF24','className'],['#94A3B8','='],['#34D399','"text-7xl font-black text-[#1A1362]"'],['#94A3B8','>']], d:122},
-    {parts:[['#E2E8F0','          Data Visualization Graphs / Charts Kit']], d:128},
-    {parts:[['#94A3B8','        </'],['#22D3EE','h1'],['#94A3B8','>']], d:134},
-    {parts:[['#94A3B8','        <'],['#22D3EE','Pills'],['#E2E8F0',' '],['#FBBF24','items'],['#94A3B8','={featurePills} />']], d:140},
-    {parts:[['#94A3B8','      </'],['#22D3EE','div'],['#94A3B8','>']], d:146},
-    {parts:[['#94A3B8','      <'],['#22D3EE','ChartGrid'],['#E2E8F0',' '],['#FBBF24','items'],['#94A3B8','={chartCards} />']], d:152},
-    {parts:[['#94A3B8','    </'],['#22D3EE','div'],['#94A3B8','>']], d:158},
-    {parts:[['#94A3B8','  );']], d:162},
-    {parts:[['#94A3B8','}']], d:166},
+    {parts:[['','']], d:4},
+    {parts:[['#C084FC','import'],['#E2E8F0',' React '],['#C084FC','from'],['#FBBF24'," 'react'"],['#94A3B8',';']], d:6},
+    {parts:[['#C084FC','import'],['#E2E8F0',' { '],['#22D3EE','FigmaLogo'],['#E2E8F0',' } '],['#C084FC','from'],['#FBBF24'," './FigmaLogo'"],['#94A3B8',';']], d:9},
+    {parts:[['#C084FC','import'],['#E2E8F0',' { '],['#22D3EE','ChartCard'],['#E2E8F0',' } '],['#C084FC','from'],['#FBBF24'," './ChartCard'"],['#94A3B8',';']], d:12},
+    {parts:[['','']], d:14},
+    {parts:[['#C084FC','const'],['#E2E8F0',' featurePills '],['#94A3B8','= [']], d:17},
+    {parts:[['#FBBF24',"  'Customizable', 'AutoLayout V4!', 'Graphs', 'Data', 'Styles'"]], d:21},
+    {parts:[['#94A3B8','];']], d:25},
+    {parts:[['','']], d:27},
+    {parts:[['#C084FC','const'],['#E2E8F0',' chartCards '],['#94A3B8','= [']], d:30},
+    {parts:[['#94A3B8','  { '],['#22D3EE','id'],['#94A3B8',": '"],['#FBBF24','bar-1'],['#94A3B8',"', "],['#22D3EE','src'],['#94A3B8',": '"],['#FBBF24','/assets/210daa94.png'],['#94A3B8',"', "],['#22D3EE','kind'],['#94A3B8',": '"],['#FBBF24','bars'],['#94A3B8',"' },"]], d:34},
+    {parts:[['#94A3B8','  { '],['#22D3EE','id'],['#94A3B8',": '"],['#FBBF24','donut-1'],['#94A3B8',"', "],['#22D3EE','src'],['#94A3B8',": '"],['#FBBF24','/assets/bde24fc0.png'],['#94A3B8',"', "],['#22D3EE','kind'],['#94A3B8',": '"],['#FBBF24','donut'],['#94A3B8',"' },"]], d:38},
+    {parts:[['#94A3B8','  { '],['#22D3EE','id'],['#94A3B8',": '"],['#FBBF24','line-1'],['#94A3B8',"', "],['#22D3EE','src'],['#94A3B8',": '"],['#FBBF24','/assets/b81b9224.png'],['#94A3B8',"', "],['#22D3EE','kind'],['#94A3B8',": '"],['#FBBF24','line'],['#94A3B8',"' },"]], d:42},
+    {parts:[['#475569','  /* …6 more chart cards wired to MCP assets */']], d:46},
+    {parts:[['#94A3B8','];']], d:50},
+    {parts:[['','']], d:52},
+    {parts:[['#C084FC','export function'],['#22D3EE',' Cover'],['#94A3B8','() {']], d:55},
+    {parts:[['#E2E8F0','  '],['#C084FC','return'],['#94A3B8',' (']], d:59},
+    {parts:[['#94A3B8','    <'],['#22D3EE','div'],['#E2E8F0',' '],['#FBBF24','className'],['#94A3B8','='],['#34D399','"bg-[#F0F2FF] min-h-screen p-12 grid grid-cols-2 gap-12"'],['#94A3B8','>']], d:63},
+    {parts:[['#94A3B8','      <'],['#22D3EE','div'],['#E2E8F0',' '],['#FBBF24','className'],['#94A3B8','='],['#34D399','"flex flex-col gap-6"'],['#94A3B8','>']], d:67},
+    {parts:[['#94A3B8','        <'],['#22D3EE','FigmaLogo'],['#94A3B8',' />']], d:71},
+    {parts:[['#94A3B8','        <'],['#22D3EE','p'],['#E2E8F0',' '],['#FBBF24','className'],['#94A3B8','='],['#34D399','"text-sm text-gray-500"'],['#94A3B8','>'],['#E2E8F0','Figma Template'],['#94A3B8','</'],['#22D3EE','p'],['#94A3B8','>']], d:75},
+    {parts:[['#94A3B8','        <'],['#22D3EE','h1'],['#E2E8F0',' '],['#FBBF24','className'],['#94A3B8','='],['#34D399','"text-7xl font-black text-[#1A1362]"'],['#94A3B8','>']], d:79},
+    {parts:[['#E2E8F0','          Data Visualization Graphs / Charts Kit']], d:83},
+    {parts:[['#94A3B8','        </'],['#22D3EE','h1'],['#94A3B8','>']], d:87},
+    {parts:[['#94A3B8','        <'],['#22D3EE','Pills'],['#E2E8F0',' '],['#FBBF24','items'],['#94A3B8','={featurePills} />']], d:91},
+    {parts:[['#94A3B8','      </'],['#22D3EE','div'],['#94A3B8','>']], d:95},
+    {parts:[['#94A3B8','      <'],['#22D3EE','ChartGrid'],['#E2E8F0',' '],['#FBBF24','items'],['#94A3B8','={chartCards} />']], d:99},
+    {parts:[['#94A3B8','    </'],['#22D3EE','div'],['#94A3B8','>']], d:103},
+    {parts:[['#94A3B8','  );']], d:106},
+    {parts:[['#94A3B8','}']], d:109},
   ];
-  function lineOp(d){return ease(cl((f-d)/6));}
+  function lineOp(d){return ease(cl((f-d)/3));}
 
   return R('div',{style:{width:'100%',height:'100%',background:'#0B1220',fontFamily:'Inter,system-ui,sans-serif',position:'relative',opacity:op,padding:'40px',boxSizing:'border-box'}},
 
